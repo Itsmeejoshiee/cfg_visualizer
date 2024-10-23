@@ -6,10 +6,10 @@ from PIL import Image
 
 # Define the grammar
 grammar = CFG.fromstring("""
-S -> A | B | C | A B | A C | B C | A B C
+S -> A B C | A B | A C | B C | A | B | C
 A -> 'a' A | 'A' A | 'a' | 'A'
 B -> 'b' B | 'B' B | 'b' | 'B'
-C -> 'c' C | 'c'
+C -> 'c' C | 'C' C | 'c' | 'C'
 """)
 
 def generate_derivation_tree(input_string):
@@ -53,25 +53,36 @@ def render_tree_to_image(tree, filename="derivation_tree.png"):
     return filename
 
 
-
 def main(page: ft.Page):
     page.title = "Derivation Tree Generator"
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER  
     page.vertical_alignment = ft.MainAxisAlignment.CENTER  
+
+    # Ensure the page can expand to fill the available space
     page.expand = True
 
     # Create a Column to center the widgets in the middle
     column = ft.Column(
         controls=[],
-        alignment=ft.MainAxisAlignment.CENTER,  
+        alignment=ft.MainAxisAlignment.CENTER, 
         horizontal_alignment=ft.CrossAxisAlignment.CENTER, 
         spacing=20,  
         expand=True  
     )
 
-    # Create a Row to hold the input field and the button, and center them horizontally
+    # Add the grammar rules text at the top
+    grammar_rules = (
+        "Grammar Rules:\n"
+        "S -> A | B | C | A B | A C | B C | A B C\n"
+        "A -> 'a' A | 'A' A | 'a' | 'A'\n"
+        "B -> 'b' B | 'B' B | 'b' | 'B'\n"
+        "C -> 'c' C | 'c'"
+    )
+
+    column.controls.append(ft.Text(value=grammar_rules, size=14)) 
+   
     row = ft.Row(
-        alignment=ft.MainAxisAlignment.CENTER,  
+        alignment=ft.MainAxisAlignment.CENTER, 
         spacing=10,  
     )
 
@@ -92,16 +103,16 @@ def main(page: ft.Page):
 
     # Define the on_generate_click function
     def on_generate_click(e):
-        input_string = input_field.value 
+        input_string = input_field.value  
         tree = generate_derivation_tree(input_string)  
 
         if tree:
-            output_filename = render_tree_to_image(tree)  
-         
+            output_filename = render_tree_to_image(tree) 
             output_message.value = f"Derivation tree saved as '{output_filename}'."  
         else:
-            output_message.value = "No valid derivation tree could be generated." 
-        
+            output_message.value = "No valid derivation tree could be generated."  
+
+
         output_message.update()  
 
     # Add the Column to the page
